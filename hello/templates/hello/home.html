@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>FoodLocator </title>
+    
+  <!-- <link rel="stylesheet" type="text/css" href="/static/hello/style.css" />  -->
+  <style type="text/css">
+      html, body, #map-canvas { height: 90%; width: 100%; margin: 0; padding: 0; margin-left: auto; margin-right: auto;}
+    </style> 
+
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBXoGxrRQoxXDnzlBCG3w56RHSEb42JP1g">
+    </script>
+    <script type="text/javascript">
+      function buildContentStr(truck){
+        var contentStr = '<div id="content">'+
+                  '<div id="siteNotice">'+
+                  '</div>'+
+                  '<h1 id="firstHeading" class="firstHeading">'+ truck.applicant + '</h1>' +
+                  '<div id="bodyContent">' +
+                  '<p>Address : '+ truck.address + '</p>' + 
+                  '</div>' +
+                  '</div>';
+          return contentStr;
+      } 
+      function addMarker(map, truck){
+        var marker = new google.maps.Marker({
+                   position: new google.maps.LatLng(truck.latitude, truck.longitude),
+                   map:map,
+                   title:truck.applicant});
+        var contentStr = buildContentStr(truck);
+        var infowindow = new google.maps.InfoWindow({
+               content: contentStr});
+        google.maps.event.addListener(marker, 'click', function() {
+                infowindow.open(map,marker);
+        });
+      }  
+      function initialize() {
+        var mapOptions = {
+          center: { lat: 37.750, lng: -122.445},
+          zoom: 12
+        };
+        var map = new google.maps.Map(document.getElementById('map-canvas'),
+            mapOptions);
+        for(var i=0;i<obj.trucks.length;i++){
+          var truck = obj.trucks[i];
+          addMarker(map,truck);          
+        } 
+      }
+      google.maps.event.addDomListener(window, 'load', initialize);
+    </script>
+  </head>
+  <body>
+	  <h1 style="text-align:center"> Where is My Food Truck? </h1>
+    <div id="map-canvas"></div>
+    <!--Get geo data from django template-->
+    <div>
+      {% block content %}
+      <script type="text/javascript">
+        var trucks_json = '{{trucks_json | safe}}';
+        var obj = JSON.parse(trucks_json);
+        // document.write('Geo Data <br>');
+        // for(var i=0;i<obj.trucks.length;i++){
+        //   document.write(obj.trucks[i].applicant + ', ' + obj.trucks[i].latitude + ', ' + obj.trucks[i].longitude + '<br>');
+        // }         
+        </script>
+        {% endblock %}
+  </body>
+  <footer>
+      <div class="contact" style="text-align:right; margin-right: 50px">
+        <p style="font-size: 12px">Contact Us</p> 
+        <p style="font-size: 10px"> FoodTruckLocator</p>
+        <p style="font-size: 10px">25 River Dr. S</p>
+        <p style="font-size: 10px">Jersey City, NJ, 07310</p>
+      </div>
+    </footer>
+</html>
